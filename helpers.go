@@ -97,8 +97,22 @@ func getStationsBetween(lat1 float64, long1 float64, lat2 float64, long2 float64
 
 func getMaxStations(num float64) string {
 	if num > 1000 {
+		return "1000"
+	} else if num < 1000 && num >= 900 {
+		return "900"
+	} else if num < 900 && num >= 800 {
+		return "800"
+	} else if num < 800 && num >= 700 {
+		return "700"
+	} else if num < 700 && num >= 600 {
+		return "600"
+	} else if num < 600 && num >= 500 {
 		return "500"
-	} else if num < 1000 && num >= 500 {
+	} else if num < 500 && num >= 400 {
+		return "400"
+	} else if num < 400 && num >= 300 {
+		return "300"
+	} else if num < 300 && num >= 200 {
 		return "250"
 	} else {
 		return "100"

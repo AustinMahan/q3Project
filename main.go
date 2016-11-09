@@ -50,7 +50,7 @@ func getBetween(res http.ResponseWriter, req *http.Request) {
 
 	num := getDisanceBetween(startLat, startLong, endLat, endLong)
 	maxStations := getMaxStations(num)
-
+	fmt.Println(num)
 	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%s&longitude=%s&distance=%s&&maxresults=%s", toString(startLat), toString(startLong), toString(num), maxStations)
 	datas := urlGetter(url)
 	startLat, startLong, endLat, endLong = rotate(startLat, startLong, endLat, endLong, num)
