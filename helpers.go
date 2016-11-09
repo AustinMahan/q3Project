@@ -72,6 +72,15 @@ func deg2rad(deg float64) float64 {
 	return deg * (math.Pi / 180)
 }
 
+func rotate(lat1, long1, lat2, long2, radius float64) (float64, float64, float64, float64) {
+	half := radius / 2
+	long1 += half / (math.Cos(lat1) * 69.172)
+	lat1 += half / 69
+	long2 -= half / (math.Cos(lat2) * 69.172)
+	lat2 -= half / 69
+	return lat1, long1, lat2, long2
+}
+
 func getStationsBetween(lat1 float64, long1 float64, lat2 float64, long2 float64, stations []Station) []Station {
 	var output []Station
 
