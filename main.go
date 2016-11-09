@@ -33,9 +33,11 @@ func getLatLong(res http.ResponseWriter, req *http.Request) {
 	startLat := mux.Vars(req)["startLat"]
 	startLong := mux.Vars(req)["startLong"]
 
-	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&maxresults=10&latitude=%d&longitude=%d", startLat, startLong)
+	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%d&longitude=%d", startLat, startLong)
 	datas := urlGetter(url)
 	output := StationToJson(datas)
+
+	res.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(res, output)
 }
 
@@ -52,5 +54,7 @@ func getBetween(res http.ResponseWriter, req *http.Request) {
 	datas := urlGetter(url)
 	allBetween := getStationsBetween(startLat, startLong, endLat, endLong, datas)
 	output := StationToJson(allBetween)
+
+	res.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(res, output)
 }
