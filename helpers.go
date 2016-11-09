@@ -72,23 +72,14 @@ func deg2rad(deg float64) float64 {
 	return deg * (math.Pi / 180)
 }
 
-func rotate(lat1, long1, lat2, long2, radius float64) (float64, float64, float64, float64) {
-	half := radius / 2
-	long1 += half / (math.Cos(lat1) * 69.172)
-	lat1 += half / 69
-	long2 -= half / (math.Cos(lat2) * 69.172)
-	lat2 -= half / 69
-	return lat1, long1, lat2, long2
-}
-
-func getStationsBetween(lat1 float64, long1 float64, lat2 float64, long2 float64, stations []Station) []Station {
+func getStationsBetween(lat1 float64, long1 float64, lat2 float64, long2 float64, stations []Station, endDistance float64) []Station {
 	var output []Station
 
-	endDistance := getDisanceBetween(lat1, long1, lat2, long2)
 	num := len(stations)
 	for i := 0; i < num; i++ {
 		stationDist := getDisanceBetween(lat2, long2, stations[i].AddressInfo.Latitude, stations[i].AddressInfo.Longitude)
-		if endDistance > stationDist {
+		startToStation := getDisanceBetween(lat1, long1, stations[i].AddressInfo.Latitude, stations[i].AddressInfo.Longitude)
+		if endDistance > stationDist && (stationDist+startToStation) < endDistance*1.25 {
 			output = append(output, stations[i])
 		}
 	}
@@ -96,27 +87,7 @@ func getStationsBetween(lat1 float64, long1 float64, lat2 float64, long2 float64
 }
 
 func getMaxStations(num float64) string {
-	if num > 1000 {
-		return "1000"
-	} else if num < 1000 && num >= 900 {
-		return "900"
-	} else if num < 900 && num >= 800 {
-		return "800"
-	} else if num < 800 && num >= 700 {
-		return "700"
-	} else if num < 700 && num >= 600 {
-		return "600"
-	} else if num < 600 && num >= 500 {
-		return "500"
-	} else if num < 500 && num >= 400 {
-		return "400"
-	} else if num < 400 && num >= 300 {
-		return "300"
-	} else if num < 300 && num >= 200 {
-		return "250"
-	} else {
-		return "100"
-	}
+	return "9999"
 }
 
 func toString(num float64) string {
