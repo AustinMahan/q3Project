@@ -10,16 +10,13 @@ import (
 	"strings"
 )
 
-func StationToJson(stations []Station) []string {
-	var output []string
-	for i := 0; i < len(stations); i++ {
-		jsonObj, err := json.Marshal(stations[i])
-		if err != nil {
-			fmt.Println(err)
-		}
-		output = append(output, string(jsonObj))
+func StationToJson(stations []Station) string {
+	byte, err := json.Marshal(stations)
+	if err != nil {
+		fmt.Println(err)
 	}
-	return output
+
+	return string(byte)
 }
 
 func urlGetter(url string) []Station {
