@@ -79,7 +79,7 @@ func getStationsBetween(lat1 float64, long1 float64, lat2 float64, long2 float64
 	for i := 0; i < num; i++ {
 		stationDist := getDisanceBetween(lat2, long2, stations[i].AddressInfo.Latitude, stations[i].AddressInfo.Longitude)
 		startToStation := getDisanceBetween(lat1, long1, stations[i].AddressInfo.Latitude, stations[i].AddressInfo.Longitude)
-		if endDistance > stationDist && (stationDist+startToStation) < endDistance*1.25 {
+		if endDistance > stationDist && (stationDist+startToStation) < endDistance*1.15 {
 			output = append(output, stations[i])
 		}
 	}

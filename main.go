@@ -33,7 +33,7 @@ func getLatLong(res http.ResponseWriter, req *http.Request) {
 	startLat := mux.Vars(req)["startLat"]
 	startLong := mux.Vars(req)["startLong"]
 
-	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%d&longitude=%d", startLat, startLong)
+	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&distance=100&maxresults=50&latitude=%s&longitude=%s", startLat, startLong)
 	datas := urlGetter(url)
 	output := StationToJson(datas)
 
