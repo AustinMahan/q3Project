@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -20,6 +21,7 @@ func main() {
 	router.HandleFunc("/hello/{name}", helloName).Methods("GET")
 	router.HandleFunc("/lat/{startLat}/long/{startLong}", getLatLong).Methods("GET")
 	router.HandleFunc("/start/lat/{startLat}/long/{startLong}/end/lat/{endLat}/long/{endLong}", getBetween).Methods("GET")
+	router.HandleFunc("/start/address/{address1}/end/{address2}", getAddresses).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
 }
@@ -36,7 +38,7 @@ func getLatLong(res http.ResponseWriter, req *http.Request) {
 	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&distance=100&maxresults=50&latitude=%s&longitude=%s", startLat, startLong)
 	datas := urlGetter(url)
 	output := StationToJson(datas)
-
+	fmt.Println(url)
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	fmt.Fprintln(res, output)
@@ -54,6 +56,30 @@ func getBetween(res http.ResponseWriter, req *http.Request) {
 	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%s&longitude=%s&distance=%s&&maxresults=%s", toString(startLat), toString(startLong), toString(num), maxStations)
 	datas := urlGetter(url)
 	allBetween := getStationsBetween(startLat, startLong, endLat, endLong, datas, num)
+	output := StationToJson(allBetween)
+
+	res.Header().Set("Content-Type", "application/json")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
+	fmt.Fprint(res, output)
+}
+
+func getAddresses(res http.ResponseWriter, req *http.Request) {
+	address1, _ := mux.Vars(req)["address1"]
+	address1 = strings.Replace(address1, " ", "+", -1)
+	address1 = fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s", address1, "AIzaSyCdps4_Lbx5p-tEJl541iZeairiuYciYZo")
+	address1Lat, address1Lng := latLngGetter(address1)
+
+	address2, _ := mux.Vars(req)["address2"]
+	address2 = strings.Replace(address2, " ", "+", -1)
+	address2 = fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s", address2, "AIzaSyCdps4_Lbx5p-tEJl541iZeairiuYciYZo")
+	address2Lat, address2Lng := latLngGetter(address2)
+
+	num := getDisanceBetween(address1Lat, address1Lng, address2Lat, address2Lng)
+	maxStations := getMaxStations(num)
+
+	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%s&longitude=%s&distance=%s&&maxresults=%s", toString(address1Lat), toString(address1Lng), toString(num), maxStations)
+	datas := urlGetter(url)
+	allBetween := getStationsBetween(address1Lat, address1Lng, address2Lat, address2Lng, datas, num)
 	output := StationToJson(allBetween)
 
 	res.Header().Set("Content-Type", "application/json")

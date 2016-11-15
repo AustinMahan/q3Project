@@ -41,6 +41,28 @@ func urlGetter(url string) []Station {
 	return jsonData
 }
 
+func latLngGetter(url string) (lat float64, lng float64) {
+	resp, err := http.Get(url)
+	defer resp.Body.Close()
+	if err != nil {
+		fmt.Println("Bad")
+		panic(err)
+	}
+
+	jsonDataFromHttp, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Bad")
+		panic(err)
+	}
+	var jsonData addressToLatLng
+	err = json.Unmarshal([]byte(jsonDataFromHttp), &jsonData)
+	if err != nil {
+		fmt.Println("Bad")
+		panic(err)
+	}
+	return jsonData.Results[0].Geometry.Location.Lat, jsonData.Results[0].Geometry.Location.Lng
+}
+
 func keepLines(s string, n int) string {
 	result := strings.Join(strings.Split(s, "\n")[:n], "\n")
 	return strings.Replace(result, "\r", "", -1)
@@ -55,6 +77,17 @@ type Station struct {
 		StateOrProvince string  `json:"StateOrProvince"`
 		Town            string  `json:"Town"`
 	} `json:"AddressInfo"`
+}
+
+type addressToLatLng struct {
+	Results []struct {
+		Geometry struct {
+			Location struct {
+				Lat float64 `json:"lat"`
+				Lng float64 `json:"lng"`
+			} `json:"location"`
+		} `json:"geometry"`
+	} `json:"results"`
 }
 
 func getDisanceBetween(lat1 float64, long1 float64, lat2 float64, long2 float64) float64 {
@@ -79,7 +112,7 @@ func getStationsBetween(lat1 float64, long1 float64, lat2 float64, long2 float64
 	for i := 0; i < num; i++ {
 		stationDist := getDisanceBetween(lat2, long2, stations[i].AddressInfo.Latitude, stations[i].AddressInfo.Longitude)
 		startToStation := getDisanceBetween(lat1, long1, stations[i].AddressInfo.Latitude, stations[i].AddressInfo.Longitude)
-		if endDistance > stationDist && (stationDist+startToStation) < endDistance*1.15 {
+		if endDistance > stationDist && (stationDist+startToStation) < endDistance*1.07 {
 			output = append(output, stations[i])
 		}
 	}
