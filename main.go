@@ -21,7 +21,7 @@ func main() {
 	router.HandleFunc("/hello/{name}", helloName).Methods("GET")
 	router.HandleFunc("/lat/{startLat}/long/{startLong}", getLatLong).Methods("GET")
 	router.HandleFunc("/start/lat/{startLat}/long/{startLong}/end/lat/{endLat}/long/{endLong}", getBetween).Methods("GET")
-	router.HandleFunc("/start/address/{address1}/end/{address2}", getAddresses).Methods("GET")
+	router.HandleFunc("/start/address/{address1}/end/address/{address2}", getAddresses).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
 }
