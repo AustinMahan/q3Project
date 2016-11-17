@@ -15,8 +15,17 @@ func StationToJson(stations []Station) string {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	return string(byte)
+}
+
+func StationToJsonWStartEnd(stations []Station, startLat, startLng, endLat, endLng float64) string {
+	byte, err := json.Marshal(stations)
+	if err != nil {
+		fmt.Println(err)
+	}
+	stringWO := string(byte)[0 : len(string(byte))-1]
+	stringW := stringWO + fmt.Sprintf(`,{"startingEndCords": {"startLat": %s, "startLng": %s, "endLat": %s, "endLng": %s}}`, toString(startLat), toString(startLng), toString(endLat), toString(endLng)) + "]"
+	return stringW
 }
 
 func urlGetter(url string) []Station {

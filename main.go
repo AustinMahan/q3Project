@@ -38,7 +38,6 @@ func getLatLong(res http.ResponseWriter, req *http.Request) {
 	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&distance=100&maxresults=50&latitude=%s&longitude=%s", startLat, startLong)
 	datas := urlGetter(url)
 	output := StationToJson(datas)
-	fmt.Println(url)
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	fmt.Fprintln(res, output)
@@ -56,7 +55,7 @@ func getBetween(res http.ResponseWriter, req *http.Request) {
 	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%s&longitude=%s&distance=%s&&maxresults=%s", toString(startLat), toString(startLong), toString(num), maxStations)
 	datas := urlGetter(url)
 	allBetween := getStationsBetween(startLat, startLong, endLat, endLong, datas, num)
-	output := StationToJson(allBetween)
+	output := StationToJsonWStartEnd(allBetween, startLat, startLong, endLat, endLong)
 
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
@@ -80,7 +79,7 @@ func getAddresses(res http.ResponseWriter, req *http.Request) {
 	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%s&longitude=%s&distance=%s&&maxresults=%s", toString(address1Lat), toString(address1Lng), toString(num), maxStations)
 	datas := urlGetter(url)
 	allBetween := getStationsBetween(address1Lat, address1Lng, address2Lat, address2Lng, datas, num)
-	output := StationToJson(allBetween)
+	output := StationToJsonWStartEnd(allBetween, address1Lat, address1Lng, address2Lat, address2Lng)
 
 	res.Header().Set("Content-Type", "application/json")
 	res.Header().Set("Access-Control-Allow-Origin", "*")
