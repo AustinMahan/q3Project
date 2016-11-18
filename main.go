@@ -63,25 +63,30 @@ func getBetween(res http.ResponseWriter, req *http.Request) {
 }
 
 func getAddresses(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
 	address1, _ := mux.Vars(req)["address1"]
 	address1 = strings.Replace(address1, " ", "+", -1)
-	address1 = fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s", address1, "AIzaSyCdps4_Lbx5p-tEJl541iZeairiuYciYZo")
+	address1 = fmt.Sprintf("https://maps.googleapis.com/maps/api/place/textsearch/json?query=%s&key=%s", address1, "AIzaSyDMbb_u0IslPPN7gmPfFbPCoqAz1Mmussc")
+
 	address1Lat, address1Lng := latLngGetter(address1)
 
 	address2, _ := mux.Vars(req)["address2"]
 	address2 = strings.Replace(address2, " ", "+", -1)
-	address2 = fmt.Sprintf("https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s", address2, "AIzaSyCdps4_Lbx5p-tEJl541iZeairiuYciYZo")
+	address2 = fmt.Sprintf("https://maps.googleapis.com/maps/api/place/textsearch/json?query=%s&key=%s", address2, "AIzaSyDMbb_u0IslPPN7gmPfFbPCoqAz1Mmussc")
 	address2Lat, address2Lng := latLngGetter(address2)
+	if address1Lat == 0 || address1Lng == 0 || address2Lat == 0 || address2Lng == 0 {
+		fmt.Fprint(res, "[]")
+	} else {
+		num := getDisanceBetween(address1Lat, address1Lng, address2Lat, address2Lng)
+		maxStations := getMaxStations(num)
 
-	num := getDisanceBetween(address1Lat, address1Lng, address2Lat, address2Lng)
-	maxStations := getMaxStations(num)
+		url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%s&longitude=%s&distance=%s&&maxresults=%s", toString(address1Lat), toString(address1Lng), toString(num), maxStations)
+		datas := urlGetter(url)
+		allBetween := getStationsBetween(address1Lat, address1Lng, address2Lat, address2Lng, datas, num)
+		output := StationToJsonWStartEnd(allBetween, address1Lat, address1Lng, address2Lat, address2Lng)
 
-	url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%s&longitude=%s&distance=%s&&maxresults=%s", toString(address1Lat), toString(address1Lng), toString(num), maxStations)
-	datas := urlGetter(url)
-	allBetween := getStationsBetween(address1Lat, address1Lng, address2Lat, address2Lng, datas, num)
-	output := StationToJsonWStartEnd(allBetween, address1Lat, address1Lng, address2Lat, address2Lng)
+		fmt.Fprint(res, output)
+	}
 
-	res.Header().Set("Content-Type", "application/json")
-	res.Header().Set("Access-Control-Allow-Origin", "*")
-	fmt.Fprint(res, output)
 }

@@ -57,11 +57,13 @@ func latLngGetter(url string) (lat float64, lng float64) {
 		fmt.Println("Bad")
 		panic(err)
 	}
-
 	jsonDataFromHttp, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Bad")
 		panic(err)
+	}
+	if string(jsonDataFromHttp[:][46:48]) == "[]" {
+		return 0, 0
 	}
 	var jsonData addressToLatLng
 	err = json.Unmarshal([]byte(jsonDataFromHttp), &jsonData)
