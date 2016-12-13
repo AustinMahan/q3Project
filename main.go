@@ -22,6 +22,7 @@ func main() {
 	router.HandleFunc("/lat/{startLat}/long/{startLong}", getLatLong).Methods("GET")
 	router.HandleFunc("/start/lat/{startLat}/long/{startLong}/end/lat/{endLat}/long/{endLong}", getBetween).Methods("GET")
 	router.HandleFunc("/start/address/{address1}/end/address/{address2}", getAddresses).Methods("GET")
+	router.HandleFunc("/start/lat/{startLat}/long/{startLong}/end/address/{address}", curLocationStart).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
 }
@@ -88,5 +89,28 @@ func getAddresses(res http.ResponseWriter, req *http.Request) {
 
 		fmt.Fprint(res, output)
 	}
+}
+func curLocationStart(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
+	startLat, _ := strconv.ParseFloat(mux.Vars(req)["startLat"], 64)
+	startLong, _ := strconv.ParseFloat(mux.Vars(req)["startLong"], 64)
 
+	address, _ := mux.Vars(req)["address"]
+	address = strings.Replace(address, " ", "+", -1)
+	address = fmt.Sprintf("https://maps.googleapis.com/maps/api/place/textsearch/json?query=%s&key=%s", address, "AIzaSyDMbb_u0IslPPN7gmPfFbPCoqAz1Mmussc")
+	addressLat, addressLng := latLngGetter(address)
+	if startLat == 0 || startLong == 0 || addressLat == 0 || addressLng == 0 {
+		fmt.Fprint(res, "[]")
+	} else {
+		num := getDisanceBetween(startLat, startLong, addressLat, addressLng)
+		maxStations := getMaxStations(num)
+
+		url := fmt.Sprintf("http://api.openchargemap.io/v2/poi/?output=json&countrycode=US&latitude=%s&longitude=%s&distance=%s&&maxresults=%s", toString(startLat), toString(startLong), toString(num), maxStations)
+		datas := urlGetter(url)
+		allBetween := getStationsBetween(startLat, startLong, addressLat, addressLng, datas, num)
+		output := StationToJsonWStartEnd(allBetween, startLat, startLong, addressLat, addressLng)
+
+		fmt.Fprint(res, output)
+	}
 }
