@@ -10,4 +10,5 @@ iOS App that finds charging stations for electric cars!
 ![Find the Closest Station to You](http://a4.mzstatic.com/us/r30/Purple111/v4/72/c9/bf/72c9bfd0-ff32-cadc-b6c5-9c2ce83ccb1f/screen696x696.jpeg)
 
 Frontend built with Swift by [Tommy Gaessler](https://github.com/tommygaessler/ChargingStations)
+
 Backend built with GO by Austin Mahan
